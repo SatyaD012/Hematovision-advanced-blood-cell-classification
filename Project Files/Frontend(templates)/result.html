@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prediction Result - HematoVision</title>
+    <!-- Poppins font for modern look -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      /* General Body Styles */
+      body {
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #e0f2f7; /* Light blue background - reverted */
+        color: #333;
+        line-height: 1.6;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center; /* Center vertically for the result page */
+        overflow-x: hidden; /* Prevent horizontal scroll */
+      }
+
+      /* Main Container Styling */
+      .container {
+        background-color: white;
+        padding: 40px;
+        border-radius: 20px; /* More rounded corners */
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Stronger, softer shadow */
+        max-width: 900px;
+        width: 100%;
+        box-sizing: border-box; /* Include padding in width calculation */
+        animation: fadeInScale 1s ease-out forwards; /* Enhanced fade in */
+        /* Removed margin-top/bottom as align-items: center handles it */
+      }
+
+      /* Keyframe for initial fade-in and subtle scale */
+      @keyframes fadeInScale {
+        from {
+          opacity: 0;
+          transform: translateY(30px) scale(0.98);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      /* Header Section */
+      .header {
+        text-align: center;
+        background-color: #007bff; /* Vibrant blue header - reverted */
+        color: white;
+        padding: 30px;
+        border-radius: 15px; /* Matched border-radius */
+        margin-bottom: 40px;
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4); /* Shadow matching new color - reverted */
+        position: relative;
+        overflow: hidden; /* For pseudo-element animation */
+      }
+
+      .header::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: rgba(255, 255, 255, 0.05); /* Subtle shimmer effect */
+        transform: rotate(30deg);
+        animation: shimmer 8s infinite forwards;
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: rotate(30deg) translateX(-100%);
+        }
+        100% {
+          transform: rotate(30deg) translateX(100%);
+        }
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: 2.8em; /* Larger heading */
+        font-weight: 700; /* Bolder font */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+      .header p {
+        font-size: 1.1em;
+        opacity: 0.9;
+      }
+
+      /* Result Section */
+      .result-section {
+        text-align: center;
+        margin: 30px 0;
+        padding: 30px; /* Increased padding */
+        background-color: #e8f5e9; /* Light green for result section - reverted */
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        animation: slideInUp 0.8s ease-out forwards; /* Animation for section */
+        animation-delay: 0.3s;
+        opacity: 0; /* Hidden initially */
+      }
+
+      @keyframes slideInUp {
+        from {
+          opacity: 0;
+          transform: translateY(50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .prediction {
+        font-size: 2.8em; /* Larger font for emphasis */
+        font-weight: 700; /* Bolder font */
+        color: #28a745; /* Green for prediction - reverted */
+        margin: 20px 0 30px; /* More bottom margin */
+        animation: scaleIn 0.8s ease-out forwards; /* Animation for text */
+        animation-delay: 0.6s;
+        opacity: 0; /* Hidden initially */
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      @keyframes scaleIn {
+        from {
+          opacity: 0;
+          transform: scale(0.8);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .uploaded-image {
+        max-width: 500px; /* Larger image preview */
+        max-height: 500px;
+        border: 4px solid #007bff; /* Blue border - reverted */
+        border-radius: 15px;
+        margin: 30px auto; /* Center the image */
+        display: block; /* Ensures margin:auto works */
+        object-fit: contain;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease, border-color 0.3s ease;
+      }
+      .uploaded-image:hover {
+        transform: scale(1.02); /* Slight zoom on hover */
+        border-color: #0056b3; /* Change border color on hover - reverted */
+      }
+
+      .image-description {
+        font-size: 1.15em; /* Slightly larger font */
+        color: #555;
+        margin-bottom: 35px; /* More space */
+      }
+
+      /* Back Button */
+      .back-btn {
+        background-color: #007bff; /* Blue button - reverted */
+        color: white;
+        padding: 15px 35px;
+        border: none;
+        border-radius: 10px; /* More rounded */
+        cursor: pointer;
+        font-size: 1.1em;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: background-color 0.3s ease, transform 0.2s ease,
+          box-shadow 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3); /* Shadow matching new color - reverted */
+        position: relative;
+        overflow: hidden;
+      }
+      .back-btn:hover {
+        background-color: #0056b3; /* Darker blue on hover - reverted */
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
+      }
+      .back-btn:active {
+        transform: translateY(0);
+      }
+      .back-btn:active::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.3);
+        animation: ripple 0.6s linear forwards;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        body {
+          padding: 15px;
+        }
+        .container {
+          padding: 25px;
+        }
+        .header h1 {
+          font-size: 2.2em;
+        }
+        .header p {
+          font-size: 0.95em;
+        }
+        .prediction {
+          font-size: 2.2em;
+        }
+        .uploaded-image {
+          max-width: 90%;
+          max-height: 300px;
+        }
+        .back-btn {
+          padding: 12px 25px;
+          font-size: 1em;
+          gap: 8px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          padding: 20px;
+        }
+        .header h1 {
+          font-size: 1.8em;
+        }
+        .header p {
+          font-size: 0.9em;
+        }
+        .prediction {
+          font-size: 1.8em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Prediction Result</h1>
+        <p>Here's what HematoVision determined!</p>
+      </div>
+
+      <div class="result-section">
+        <div class="prediction">
+          Predicted Class:
+          <span style="color: #007bff">{{ class_label.title() }}</span>
+        </div>
+
+        <img
+          src="data:image/png;base64,{{ img_data }}"
+          alt="Uploaded Blood Cell Image"
+          class="uploaded-image"
+        />
+        <p class="image-description">
+          This is the image you uploaded for classification.
+        </p>
+
+        <a href="/" class="back-btn">
+          <i class="fas fa-undo"></i> Upload Another Image
+        </a>
+      </div>
+    </div>
+  </body>
+</html>

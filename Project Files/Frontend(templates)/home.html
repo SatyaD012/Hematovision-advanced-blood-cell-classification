@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HematoVision - Blood Cell Classification</title>
+    <!-- Poppins font for modern look -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      /* General Body Styles */
+      body {
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(
+          135deg,
+          #e0f7fa 0%,
+          #b2ebf2 100%
+        ); /* Gentle blue gradient */
+        color: #333;
+        line-height: 1.6;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start; /* Aligns content to the top */
+        overflow-x: hidden; /* Prevent horizontal scroll */
+      }
+
+      /* Main Container Styling */
+      .container {
+        background-color: white;
+        padding: 40px;
+        border-radius: 20px; /* More rounded corners */
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Stronger, softer shadow */
+        max-width: 900px;
+        width: 100%;
+        box-sizing: border-box; /* Include padding in width calculation */
+        animation: fadeInScale 1s ease-out forwards; /* Enhanced fade in */
+        margin-top: 20px; /* Add some top margin to prevent sticking to the very top */
+        margin-bottom: 20px; /* Add some bottom margin */
+      }
+
+      /* Keyframe for initial fade-in and subtle scale */
+      @keyframes fadeInScale {
+        from {
+          opacity: 0;
+          transform: translateY(30px) scale(0.98);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      /* Header Section */
+      .header {
+        text-align: center;
+        background: linear-gradient(
+          45deg,
+          #007bff,
+          #0056b3
+        ); /* Blue gradient header */
+        color: white;
+        padding: 30px;
+        border-radius: 15px; /* Matched border-radius */
+        margin-bottom: 40px;
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+        position: relative;
+        overflow: hidden; /* For pseudo-element animation */
+      }
+
+      .header::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: rgba(255, 255, 255, 0.05); /* Subtle shimmer effect */
+        transform: rotate(30deg);
+        animation: shimmer 8s infinite forwards;
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: rotate(30deg) translateX(-100%);
+        }
+        100% {
+          transform: rotate(30deg) translateX(100%);
+        }
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: 2.8em; /* Larger heading */
+        font-weight: 700; /* Bolder font */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+      .header p {
+        font-size: 1.1em;
+        opacity: 0.9;
+      }
+
+      /* Info Section */
+      .info-section {
+        margin-top: 30px;
+        padding: 30px;
+        background-color: #e3f2fd; /* Lighter blue for info */
+        border-radius: 15px;
+        margin-bottom: 40px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        animation: slideInLeft 0.8s ease-out forwards; /* Delayed animation */
+        animation-delay: 0.3s;
+        opacity: 0; /* Hidden initially */
+      }
+
+      @keyframes slideInLeft {
+        from {
+          opacity: 0;
+          transform: translateX(-50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .info-section h2 {
+        color: #007bff;
+        margin-top: 0;
+        font-size: 2em;
+        font-weight: 600;
+        border-bottom: 2px solid #a7d9ff; /* Subtle underline */
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+      }
+
+      /* Upload Section */
+      .upload-section {
+        text-align: center;
+        margin: 30px 0;
+        padding: 30px;
+        background-color: #f1f8e9; /* Very light green for upload section */
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        animation: slideInRight 0.8s ease-out forwards; /* Delayed animation */
+        animation-delay: 0.6s;
+        opacity: 0; /* Hidden initially */
+      }
+
+      @keyframes slideInRight {
+        from {
+          opacity: 0;
+          transform: translateX(50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .upload-section h2 {
+        color: #28a745; /* Green for upload heading */
+        font-size: 2em;
+        font-weight: 600;
+        border-bottom: 2px solid #c8e6c9; /* Subtle underline */
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+      }
+
+      /* File Input Styling */
+      .file-input-wrapper {
+        position: relative;
+        display: inline-block;
+        margin: 25px 0; /* More vertical space */
+        cursor: pointer;
+        overflow: hidden; /* For ripple effect */
+        border-radius: 8px;
+      }
+
+      .file-input {
+        opacity: 0;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+      }
+
+      .file-input-label {
+        background-color: #007bff;
+        color: white;
+        padding: 15px 30px; /* Larger padding */
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 17px; /* Slightly larger font */
+        transition: background-color 0.3s ease, transform 0.2s ease,
+          box-shadow 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px; /* More space for icon */
+        box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+        font-weight: 600;
+        position: relative;
+        z-index: 1;
+        overflow: hidden;
+      }
+
+      .file-input-label:hover {
+        background-color: #0056b3;
+        transform: translateY(-3px); /* More pronounced lift */
+        box-shadow: 0 8px 20px rgba(0, 123, 255, 0.4);
+      }
+
+      /* Ripple effect for button */
+      .file-input-label:active {
+        transform: translateY(0);
+      }
+      .file-input-label:active::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.3);
+        animation: ripple 0.6s linear forwards;
+      }
+
+      @keyframes ripple {
+        0% {
+          width: 0;
+          height: 0;
+          opacity: 1;
+        }
+        100% {
+          width: 200%;
+          height: 200%;
+          opacity: 0;
+        }
+      }
+
+      #file-name {
+        margin-top: 15px; /* More space */
+        font-style: italic;
+        color: #666;
+        font-size: 1.05em;
+        min-height: 20px; /* Prevent layout shift */
+      }
+
+      #image-preview {
+        max-width: 250px; /* Larger preview */
+        max-height: 0; /* Start hidden with 0 height */
+        margin-top: 25px;
+        border: 3px dashed #c0e0f0; /* Softer dashed border */
+        border-radius: 12px;
+        object-fit: contain;
+        padding: 5px; /* Internal padding for dashed border effect */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: max-height 0.5s ease-out, opacity 0.5s ease-out; /* Smooth transition for display */
+        opacity: 0; /* Start hidden with 0 opacity */
+        overflow: hidden; /* Hide overflow during height transition */
+      }
+      /* Class to show the image preview with animation */
+      #image-preview.show {
+        max-height: 250px; /* Animate to full height */
+        opacity: 1; /* Animate to full opacity */
+      }
+
+      /* Predict Button */
+      .predict-btn {
+        background-color: #28a745; /* Green predict button */
+        color: white;
+        padding: 18px 40px; /* Larger padding */
+        border: none;
+        border-radius: 10px; /* More rounded */
+        cursor: pointer;
+        font-size: 1.2em; /* Larger font */
+        font-weight: 700; /* Bolder font */
+        transition: background-color 0.3s ease, transform 0.2s ease,
+          box-shadow 0.3s ease;
+        margin-top: 30px; /* More space */
+        box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4);
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .predict-btn:hover {
+        background-color: #218838;
+        transform: translateY(-4px); /* More pronounced lift */
+        box-shadow: 0 10px 25px rgba(40, 167, 69, 0.5);
+      }
+
+      .predict-btn:active {
+        transform: translateY(0);
+      }
+      .predict-btn:active::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.3);
+        animation: ripple 0.6s linear forwards;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        body {
+          padding: 15px;
+          /* align-items: flex-start;  Already set globally */
+        }
+        .container {
+          padding: 25px;
+          margin-top: 20px; /* Add some top margin */
+          margin-bottom: 20px;
+        }
+        .header h1 {
+          font-size: 2.2em;
+        }
+        .header p {
+          font-size: 0.95em;
+        }
+        .info-section h2,
+        .upload-section h2 {
+          font-size: 1.7em;
+        }
+        .file-input-label,
+        .predict-btn {
+          padding: 12px 25px;
+          font-size: 1em;
+          gap: 10px;
+        }
+        #image-preview {
+          max-width: 180px;
+          max-height: 180px;
+        }
+        #image-preview.show {
+          max-height: 180px; /* Adjust max-height for smaller screens */
+        }
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          padding: 20px;
+        }
+        .header h1 {
+          font-size: 1.8em;
+        }
+        .header p {
+          font-size: 0.9em;
+        }
+        .info-section h2,
+        .upload-section h2 {
+          font-size: 1.4em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Welcome to HematoVision</h1>
+        <p>Your intelligent assistant for blood cell classification.</p>
+      </div>
+
+      <div class="info-section">
+        <h2>About Blood Cells</h2>
+        <p>
+          Blood cells are fundamental components of our body, each with a unique
+          and essential role.
+          <strong>Red blood cells (erythrocytes)</strong> transport oxygen,
+          <strong>white blood cells (leukocytes)</strong> are crucial for our
+          immune system, and <strong>platelets (thrombocytes)</strong> are
+          involved in blood clotting. Accurate identification of these cells is
+          pivotal for diagnosing various medical conditions and understanding
+          overall health.
+        </p>
+      </div>
+
+      <div class="upload-section">
+        <h2>Predict Blood Cell Type</h2>
+        <p>
+          Ready to classify? Upload an image of a blood cell, and our
+          cutting-edge AI model will swiftly determine its type. We support JPG,
+          JPEG, and PNG formats.
+        </p>
+
+        <form method="POST" enctype="multipart/form-data">
+          <div class="file-input-wrapper">
+            <input
+              type="file"
+              name="file"
+              accept=".jpg,.jpeg,.png"
+              class="file-input"
+              id="file-upload"
+              required
+            />
+            <label for="file-upload" class="file-input-label">
+              <i class="fas fa-upload"></i> Choose Image
+            </label>
+          </div>
+          <p id="file-name">No file chosen</p>
+          <img id="image-preview" src="#" alt="Image Preview" />
+          <br />
+          <button type="submit" class="predict-btn">
+            <i class="fas fa-microscope"></i> Predict
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const fileUpload = document.getElementById("file-upload");
+      const fileNameDisplay = document.getElementById("file-name");
+      const imagePreview = document.getElementById("image-preview");
+
+      fileUpload.addEventListener("change", function () {
+        if (this.files && this.files[0]) {
+          const fileName = this.files[0].name;
+          fileNameDisplay.textContent = fileName;
+
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            imagePreview.src = e.target.result;
+            // Add 'show' class to trigger animation
+            imagePreview.classList.add("show");
+          };
+          reader.readAsDataURL(this.files[0]);
+        } else {
+          fileNameDisplay.textContent = "No file chosen";
+          // Remove 'show' class and clear image
+          imagePreview.classList.remove("show");
+          imagePreview.src = "#";
+        }
+      });
+    </script>
+  </body>
+</html>
